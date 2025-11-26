@@ -23,22 +23,18 @@ function resetQuizSession() {
 // SYSTEME ANTI-TRICHE RENFORCÉ
 // =============================
 
-// 1) Si l'utilisateur change d’onglet → reset immédiat
 document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
         resetQuizSession();
     }
 });
 
-// 2) Si l’utilisateur minimise la fenêtre ou perd le focus → reset
 window.addEventListener("blur", () => {
     resetQuizSession();
 });
 
-// 3) Empêcher le clic droit
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 
-// 4) Empêcher F12, Ctrl+Shift+I, Ctrl+U, etc.
 document.addEventListener("keydown", (e) => {
     if (
         e.key === "F12" ||
@@ -50,15 +46,34 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-// 5) Exiger le plein écran
+// Plein écran
 function goFullScreen() {
     const el = document.documentElement;
     if (el.requestFullscreen) el.requestFullscreen();
 }
 
 /* ============================================================
+============== MUSIQUE DE FOND (STYLE KAHOOT) =================
+============================================================ */
+
+function startMusic() {
+    const audio = document.getElementById("bgMusic");
+    audio.volume = 0.4; 
+    audio.play().catch(() => {
+        document.addEventListener("click", () => audio.play(), { once: true });
+    });
+}
+
+function stopMusic() {
+    const audio = document.getElementById("bgMusic");
+    audio.pause();
+    audio.currentTime = 0;
+}
+
+/* ============================================================
 ================ VARIABLES GLOBALES ========================
 ============================================================ */
+
 let user = { nom: "", prenom: "" };
 let current = 0;
 let score = 0;
@@ -67,6 +82,7 @@ let shuffledQuestions = [];
 /* ============================================================
 ================ MÉLANGE DE TABLEAUX =======================
 ============================================================ */
+
 function shuffleArray(arr) {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
@@ -76,15 +92,14 @@ function shuffleArray(arr) {
     return a;
 }
 
-// 🔥 VERSION CORRIGÉE — conserve la bonne réponse même après mélange
+// 🔥 Correction : nouvelle position de la bonne réponse après mélange
 function shuffleQuestions() {
     return questions.map((q) => {
         const shuffledOptions = shuffleArray(q.options);
-
         return {
             ...q,
             options: shuffledOptions,
-            correct: shuffledOptions.indexOf(q.options[q.correct]) // nouvelle position correcte
+            correct: shuffledOptions.indexOf(q.options[q.correct])
         };
     });
 }
@@ -92,6 +107,7 @@ function shuffleQuestions() {
 /* ============================================================
 ================= SAUVEGARDE ET CHARGEMENT ===================
 ============================================================ */
+
 function saveProgress() {
     sessionStorage.setItem("currentQuestion", current);
     sessionStorage.setItem("score", score);
@@ -365,16 +381,11 @@ function showQuestion() {
     document.getElementById("quiz").innerHTML = `
         <h2>${q.question}</h2>
         <div id="options" class="answer-grid">
-            ${q.options
-                .map(
-                    (opt, index) => `
-                <button class="answer-btn color-${index}" data-index="${index}">
-                    <span class="shape shape-${index}"></span>
+            ${q.options.map((opt, index) => `
+                <button class="answer-btn" data-index="${index}">
                     ${opt}
                 </button>
-            `
-                )
-                .join("")}
+            `).join("")}
         </div>
         <p id="score">Score actuel : ${score} / ${shuffledQuestions.length}</p>
     `;
@@ -385,8 +396,9 @@ function showQuestion() {
 }
 
 /* ============================================================
-================= SELECTION DE REPONSE =======================
+=================== SELECTION DE REPONSE ======================
 ============================================================ */
+
 function selectAnswer(btn, questionObj) {
     const index = parseInt(btn.dataset.index);
 
@@ -415,19 +427,24 @@ function loadNextQuestion() {
 }
 
 /* ============================================================
-======================== FIN DU QUIZ ========================
+======================== FIN DU QUIZ ==========================
 ============================================================ */
+
 function endQuiz() {
+    stopMusic(); // 🔥 coupe la musique
+
     document.getElementById("quiz").innerHTML = `
         <h2>Quiz terminé !</h2>
         <p>Score final : ${score} / ${shuffledQuestions.length}</p>
     `;
+
     sessionStorage.clear();
 }
 
 /* ============================================================
-====================== LANCEMENT DU QUIZ ====================
+====================== LANCEMENT DU QUIZ ======================
 ============================================================ */
+
 document.getElementById("startQuiz").addEventListener("click", () => {
     const nom = document.getElementById("nom").value.trim();
     const prenom = document.getElementById("prenom").value.trim();
@@ -446,6 +463,7 @@ document.getElementById("startQuiz").addEventListener("click", () => {
 
     saveProgress();
     goFullScreen();
+    startMusic(); // 🔥 musique façon Kahoot
 
     document.getElementById("userForm").style.display = "none";
     document.getElementById("quiz").style.display = "block";
