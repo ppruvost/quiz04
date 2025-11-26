@@ -1,34 +1,23 @@
 // =============================
-// GESTION DE SESSION POUR RECOMMENCER LE QUIZ
-// =============================
-
-// Lors du chargement de la page
-window.addEventListener("load", () => {
-    if (sessionStorage.getItem("quizStarted")) {
-        // L'utilisateur est revenu alors qu'une session existait → reset complet
-        resetQuizSession();
-    }
-
-    // Marque que le quiz est lancé dans cet onglet
-    sessionStorage.setItem("quizStarted", "true");
-});
-
-// Réinitialisation complète du quiz
-function resetQuizSession() {
-    sessionStorage.removeItem("quizStarted");
-    sessionStorage.removeItem("currentQuestion");
-    sessionStorage.removeItem("score");
-    sessionStorage.removeItem("shuffledQuestions");
-
-    // Retour page d’accueil du quiz (à ajuster si ton fichier a un nom différent)
-    window.location.href = "index.html";
+sessionStorage.removeItem("score");
+sessionStorage.removeItem("shuffledQuestions");
+window.location.href = "index.html";
 }
 
 
+// Si l'utilisateur change d’onglet → reset immédiat
+// (détection anti-changement d’onglet)
+document.addEventListener("visibilitychange", () => {
+if (document.visibilityState === "hidden") {
+resetQuizSession();
+}
+});
+
 
 /* ============================================================
-   ===============  VARIABLES GLOBALES  ========================
-   ============================================================ */
+=============== VARIABLES GLOBALES ========================
+============================================================ */
+
 
 let user = { nom: "", prenom: "" };
 let current = 0;
@@ -36,27 +25,30 @@ let score = 0;
 let shuffledQuestions = [];
 
 
+
+
 /* ============================================================
-   ===============  MÉLANGE DE TABLEAUX  =======================
-   ============================================================ */
+=============== MÉLANGE DE TABLEAUX =======================
+============================================================ */
+
 
 function shuffleArray(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
+const a = [...arr];
+for (let i = a.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[a[i], a[j]] = [a[j], a[i]];
 }
+return a;
+}
+
 
 // Mélange questions + réponses
 function shuffleQuestions() {
-    return questions.map((q) => ({
-        ...q,
-        options: shuffleArray(q.options)
-    }));
+return questions.map((q) => ({
+...q,
+options: shuffleArray(q.options)
+}));
 }
-
 
 /* ============================================================
    ====================  LISTE DES QUESTIONS  ==================
@@ -281,117 +273,70 @@ const questions = [
 ];
 
 /* ============================================================
-   =================== AFFICHAGE D'UNE QUESTION ================
-   ============================================================ */
-
-function showQuestion() {
-    const question = shuffledQuestions[current];
-
-    let optionsHTML = question.options.map((option, index) => {
-        const inputId = `q${current}_opt${index}`;
-
-        return `
-            <div class="option-container">
-                <input type="radio" id="${inputId}" name="q${current}" value="${option}">
-                <label for="${inputId}">${option}</label>
-            </div>
-        `;
-    }).join('');
-
-    document.getElementById("quiz").innerHTML = `
-        <h2>${question.question}</h2>
-        ${optionsHTML}
-        <button class="validate" onclick="validateAnswer()">Valider</button>
-        <div id="explication"></div>
-    `;
+});
 }
 
 
-/* ============================================================
-   ======================== VALIDATION =========================
-   ============================================================ */
+document.getElementById("score").innerText =
+`Score actuel : ${score} / ${shuffledQuestions.length}`;
 
-function validateAnswer() {
-    const selected = document.querySelector(`input[name="q${current}"]:checked`);
 
-    if (!selected) {
-        document.getElementById("explication").innerHTML = "Veuillez sélectionner une réponse.";
-        return;
-    }
+current++;
 
-    const q = shuffledQuestions[current];
-    const userAnswer = selected.value;
 
-    const label = selected.nextElementSibling;
-
-    label.classList.add("answer-selected");
-
-    setTimeout(() => {
-
-        if (userAnswer === q.bonne_reponse) {
-            score++;
-            label.classList.add("answer-correct");
-            document.getElementById("explication").innerHTML =
-                `<span class='success'>Bonne réponse !</span> ${q.explication}`;
-        } else {
-            label.classList.add("answer-wrong");
-            document.getElementById("explication").innerHTML =
-                `<span class='fail'>Mauvaise réponse.</span> ${q.explication}`;
-
-            document.querySelectorAll(`input[name="q${current}"]`).forEach((input) => {
-                if (input.value === q.bonne_reponse) {
-                    input.nextElementSibling.classList.add("answer-correct-auto");
-                }
-            });
-        }
-
-        document.getElementById("score").innerText =
-            `Score actuel : ${score} / ${shuffledQuestions.length}`;
-
-        current++;
-
-        if (current < shuffledQuestions.length) {
-            setTimeout(showQuestion, 2500);
-        } else {
-            setTimeout(endQuiz, 2500);
-        }
-    }, 300);
+if (current < shuffledQuestions.length) {
+setTimeout(showQuestion, 2500);
+} else {
+setTimeout(endQuiz, 2500);
+}
+}, 300);
 }
 
 
+
+
 /* ============================================================
-   ======================== FIN DU QUIZ ========================
-   ============================================================ */
+======================== FIN DU QUIZ ========================
+============================================================ */
+
 
 function endQuiz() {
-    document.getElementById("quiz").innerHTML = `
-        <h2>Quiz terminé !</h2>
-        <p>Score final : ${score} / ${shuffledQuestions.length}</p>`;
+document.getElementById("quiz").innerHTML = `
+<h2>Quiz terminé !</h2>
+<p>Score final : ${score} / ${shuffledQuestions.length}</p>`;
 }
 
 
+
+
 /* ============================================================
-   ====================== LANCEMENT DU QUIZ ====================
-   ============================================================ */
+====================== LANCEMENT DU QUIZ ====================
+============================================================ */
+
 
 document.getElementById("startQuiz").addEventListener("click", () => {
-    const nom = document.getElementById("nom").value.trim();
-    const prenom = document.getElementById("prenom").value.trim();
+const nom = document.getElementById("nom").value.trim();
+const prenom = document.getElementById("prenom").value.trim();
 
-    if (!nom || !prenom) {
-        alert("Merci de renseigner votre nom et prénom avant de commencer.");
-        return;
-    }
 
-    user.nom = nom;
-    user.prenom = prenom;
+if (!nom || !prenom) {
+alert("Merci de renseigner votre nom et prénom avant de commencer.");
+return;
+}
 
-    shuffledQuestions = shuffleQuestions();  
-    current = 0;
-    score = 0;
 
-    document.getElementById("userForm").style.display = "none";
-    document.getElementById("quiz").style.display = "block";
+user.nom = nom;
+user.prenom = prenom;
 
-    showQuestion();
+
+shuffledQuestions = shuffleQuestions();
+current = 0;
+score = 0;
+
+
+document.getElementById("userForm").style.display = "none";
+document.getElementById("quiz").style.display = "block";
+
+
+showQuestion();
 });
