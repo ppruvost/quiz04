@@ -47,27 +47,25 @@ h1, h2 {
     cursor: pointer;
     position: relative;
     height: 110px;
-
-    /* effet */
     transition: transform 0.15s ease-in-out, box-shadow 0.2s;
 }
 
-/* Effet hover */
+/* Hover */
 .answer-btn:hover {
     transform: scale(1.03);
     box-shadow: 0 6px 18px rgba(0,0,0,0.25);
 }
 
 /* ============================================================
-   COULEURS TYPE KAHOOT
+   COULEURS RÉPONSES
 ============================================================ */
-.color-0 { background: #e74c3c; } /* rouge */
-.color-1 { background: #3498db; } /* bleu */
-.color-2 { background: #f1c40f; } /* jaune */
-.color-3 { background: #2ecc71; } /* vert */
+.color-0 { background: #e74c3c; }
+.color-1 { background: #3498db; }
+.color-2 { background: #f1c40f; }
+.color-3 { background: #2ecc71; }
 
 /* ============================================================
-   FORMES KAHOOT (triangle, losange, cercle, carré)
+   FORMES KAHOOT
 ============================================================ */
 .shape {
     width: 28px;
@@ -75,7 +73,7 @@ h1, h2 {
     display: inline-block;
 }
 
-.shape-0 { /* triangle rouge */
+.shape-0 { /* triangle */
     width: 0;
     height: 0;
     border-left: 14px solid transparent;
@@ -83,19 +81,9 @@ h1, h2 {
     border-bottom: 28px solid white;
 }
 
-.shape-1 { /* losange bleu */
-    background: white;
-    transform: rotate(45deg);
-}
-
-.shape-2 { /* cercle jaune */
-    background: white;
-    border-radius: 50%;
-}
-
-.shape-3 { /* carré vert */
-    background: white;
-}
+.shape-1 { background: white; transform: rotate(45deg); } /* losange */
+.shape-2 { background: white; border-radius: 50%; }        /* cercle */
+.shape-3 { background: white; }                            /* carré */
 
 /* ============================================================
    ANIMATIONS RÉPONSES
@@ -141,10 +129,52 @@ h1, h2 {
     .answer-grid {
         grid-template-columns: 1fr;
     }
-
     .answer-btn {
         height: auto;
         padding: 18px;
         font-size: 1.15em;
     }
+}
+
+/* ============================================================
+   ÉCRAN DE DÉMARRAGE (amélioré)
+============================================================ */
+.start-screen {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.start-screen input[type="text"] {
+    width: 420px;            /* ⭐ plus large */
+    padding: 18px 22px;      /* ⭐ plus confortable */
+    font-size: 22px;         /* ⭐ plus grand */
+    border-radius: 14px;
+    border: 2px solid #aaa;
+    margin-bottom: 20px;
+    background: #f8f8f8;
+    color: #000;
+}
+
+.start-screen input[type="text"]:focus {
+    border-color: #4a90e2;
+    background: white;
+    outline: none;
+}
+
+/* --- Bouton démarrer amélioré --- */
+#start-btn {
+    font-size: 26px;         /* ⭐ plus grand */
+    padding: 18px 35px;      /* ⭐ plus visible */
+    border-radius: 16px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    transition: 0.25s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+#start-btn:hover {
+    background-color: #43a047;
+    transform: scale(1.08);
 }
