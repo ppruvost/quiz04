@@ -63,147 +63,222 @@ function shuffleQuestions() {
    ============================================================ */
 
 const questions = [
-  { 
-    question: "1. Coût de production : C(x) = x³ − 3x² + 2x + 50. Quelle est la dérivée C'(x) ?", 
-    options: ["3x² − 6x + 2", "x² − 6x + 2", "3x² − 3x + 2", "3x² − 6x"], 
-    bonne_reponse: "3x² − 6x + 2", 
-    explication: "On dérive terme par terme : (x³)'=3x², (−3x²)'=−6x, (2x)'=2, la constante disparaît." 
+  {
+    question: "1. Lors d’un changement d’état, la température d’un corps pur :",
+    options: [
+      "augmente",
+      "diminue",
+      "reste constante",
+      "varie selon la masse"
+    ],
+    correct: 2,
+    explanation: "Pendant la fusion ou la solidification, l’énergie sert à changer l’état, pas à augmenter la température. En atelier soudure : un métal fond à température fixe (ex : acier ≈ 1530°C)."
   },
-
-  { 
-    question: "2. Satisfaction client : S(x) = −x³ + 6x² − 9x + 80. Calculer S'(2).", 
-    options: ["−3", "3", "6", "0"], 
-    bonne_reponse: "3", 
-    explication: "S'(x)=−3x² + 12x − 9. Pour x=2 : −12 + 24 − 9 = 3." 
+  {
+    question: "2. La chaleur correspond à :",
+    options: [
+      "une température élevée",
+      "un transfert d’énergie",
+      "une masse importante",
+      "une couleur rouge"
+    ],
+    correct: 1,
+    explanation: "La chaleur est un transfert d’énergie d’un corps chaud vers un corps froid. Exemple atelier : une pièce chaude sortant du four transmet de l’énergie au marbre froid."
   },
-
-  { 
-    question: "3. Production journalière : P(x) = 2x³ − 9x² + 12x + 200. Que vaut P'(1) ?", 
-    options: ["0", "5", "−2", "3"], 
-    bonne_reponse: "0", 
-    explication: "P'(x)=6x² − 18x + 12. Pour x=1 : 6 − 18 + 12 = 0." 
+  {
+    question: "3. Quelle est l’unité de l’énergie thermique Q ?",
+    options: ["le Watt", "le Joule", "le Kelvin", "le Volt"],
+    correct: 1,
+    explanation: "Q se mesure en Joule (J). En atelier : chauffage d’une tôle avant cintrage = énergie (J) fournie par le chalumeau."
   },
-
-  { 
-    question: "4. Flux logistique : F(x) = −2x³ + 12x² − 18x + 100. Solutions de F'(x)=0 ?", 
-    options: ["x=1 et x=3", "x=−1 et x=2", "x=2 et x=4", "x=0 et x=3"], 
-    bonne_reponse: "x=1 et x=3", 
-    explication: "F'(x)=−6(x−1)(x−3). Les racines sont x=1 et x=3." 
+  {
+    question: "4. Dans un calorimètre, les échanges de chaleur avec l’extérieur :",
+    options: [
+      "sont importants",
+      "sont négligeables",
+      "dépendent du métal",
+      "raffraichissent l’eau"
+    ],
+    correct: 1,
+    explanation: "Un calorimètre limite les pertes. En atelier, une thermos fonctionne pareil : elle garde le café chaud."
   },
-
-  { 
-    question: "5. Temps de traitement : T(x)=x³ + 3x² − 9x + 20. Calculer T'(1).", 
-    options: ["−1","0","1","3"], 
-    bonne_reponse: "0", 
-    explication: "T'(x)=3x² + 6x − 9 → T'(1)=3+6−9=0." 
+  {
+    question: "5. Ajouter 10 g de glace à 20°C dans 250 mL d’eau à 20°C :",
+    options: [
+      "réchauffe l’eau",
+      "refroidit légèrement l’eau",
+      "ne change rien",
+      "fait bouillir l’eau"
+    ],
+    correct: 1,
+    explanation: "La glace absorbe de l’énergie pour fondre → l’eau se refroidit. En atelier : refroidissement d’une soudure par eau."
   },
-
-  { 
-    question: "6. Recette : R(x)=x³ − x² − x + 50. Que vaut R'(1) ?", 
-    options: ["1","0","−1","2"], 
-    bonne_reponse: "0", 
-    explication: "R'(x)=3x² − 2x − 1 → R'(1)=3−2−1=0." 
+  {
+    question: "6. Lors de la fusion de la glace, l’énergie fournie sert à :",
+    options: [
+      "augmenter la température",
+      "changer l’état",
+      "réduire la masse",
+      "faire bouillir l’eau"
+    ],
+    correct: 1,
+    explanation: "Pendant la fusion, l’énergie sert uniquement à casser les liaisons solides. En atelier : chauffer une brasure avant soudure sert d’abord à atteindre l’état liquide."
   },
-
-  { 
-    question: "7. Satisfaction : S(x)=−x³ + 3x² + x + 60. Calculer S'(3).", 
-    options: ["−8","8","0","5"], 
-    bonne_reponse: "−8", 
-    explication: "S'(3)=−27+18+1=−8." 
+  {
+    question: "7. La température finale dans un calorimètre après ajout de glace dépend principalement :",
+    options: [
+      "du volume de glace",
+      "de la couleur du calorimètre",
+      "du bruit ambiant",
+      "de la forme du glaçon"
+    ],
+    correct: 0,
+    explanation: "Plus il y a de glace, plus il faut d’énergie pour la faire fondre. En atelier : plus une pièce métallique est massive, plus elle absorbe de chaleur avant soudure."
   },
-
-  { 
-    question: "8. Stock : I(x)=x³ − 6x² + 11x + 30. Calculer I'(2).", 
-    options: ["−1","1","0","2"], 
-    bonne_reponse: "−1", 
-    explication: "I'(2)=12−24+11=−1." 
+  {
+    question: "8. Quel phénomène se produit lorsqu'une soudure est refroidie trop vite ?",
+    options: [
+      "déformation ou fissure",
+      "augmentation de la résistance",
+      "polissage automatique",
+      "aucun effet"
+    ],
+    correct: 0,
+    explanation: "Un refroidissement brutal crée des contraintes internes. Comme dans le calorimètre, la répartition de chaleur influence le comportement du matériau."
   },
-
-  { 
-    question: "9. Contrôle qualité : Q(x)=2x³ − 3x² − 12x + 40. Racines de Q'(x) ?", 
-    options: ["x=−1 et x=2","x=1 et x=3","x=−2 et x=1","x=2 seulement"], 
-    bonne_reponse: "x=−1 et x=2", 
-    explication: "Q'(x)=6(x−2)(x+1)." 
+  {
+    question: "9. L’énergie massique de fusion de la glace correspond à :",
+    options: [
+      "l’énergie nécessaire pour chauffer la glace de 1°C",
+      "l’énergie pour faire fondre 1 kg de glace",
+      "la température de la glace",
+      "la masse de la glace"
+    ],
+    correct: 1,
+    explanation: "Elle représente l’énergie à fournir pour passer de solide à liquide. En atelier : même principe pour faire fondre un métal avant soudage."
   },
-
-  { 
-    question: "10. Organisation RH : W(x)=−x³ + 9x² − 24x + 30. Où la fonction décroît-elle ?", 
-    options: ["[0;2[ et ]4;6]","[2;4]","[0;6]","]2;4["], 
-    bonne_reponse: "[0;2[ et ]4;6]", 
-    explication: "W'(x)=−3(x−2)(x−4) négative avant 2 et après 4." 
+  {
+    question: "10. Lors d’un refroidissement, l’énergie thermique :",
+    options: [
+      "arrive du froid",
+      "est perdue vers l’extérieur",
+      "est transférée du corps chaud vers le corps froid",
+      "augmente spontanément"
+    ],
+    correct: 2,
+    explanation: "La chaleur se déplace toujours du chaud vers le froid. Exemple atelier : une soudure chaude transmet sa chaleur à l’étau en acier."
   },
-
-  { 
-    question: "11. Dossier client : f(x)=x³ − 4x² + 4x + 10. Points critiques ?", 
-    options: ["x=2 et x=2/3","x=−1 et x=3","x=1 et x=4","x=0 et x=2"], 
-    bonne_reponse: "x=2 et x=2/3", 
-    explication: "Δ=16 → racines 2 et 2/3." 
+  {
+    question: "11. La capacité calorifique massique de l’eau signifie que :",
+    options: [
+      "l’eau chauffe vite",
+      "il faut beaucoup d’énergie pour augmenter sa température",
+      "l’eau bout facilement",
+      "elle absorbe peu de chaleur"
+    ],
+    correct: 1,
+    explanation: "L’eau stocke beaucoup d’énergie. En atelier : d’où l’efficacité du refroidissement à l’eau pour limiter les déformations."
   },
-
-  { 
-    question: "12. Temps machine : T(x)=2x³ − 12x² + 18x + 5. Solutions de T'(x)=0 ?", 
-    options: ["x=1 et x=3","x=2 et x=4","x=0 et x=2","x=−1 et x=3"], 
-    bonne_reponse: "x=1 et x=3", 
-    explication: "T'(x)=6(x−1)(x−3)." 
+  {
+    question: "12. Le principe du calorimètre est utilisé en atelier pour :",
+    options: [
+      "mesurer des tensions électriques",
+      "limiter les pertes thermiques",
+      "colorer les métaux",
+      "souffler de l’air"
+    ],
+    correct: 1,
+    explanation: "Limiter les échanges thermiques permet de contrôler les températures. Exemple : maintien d’une pièce chaude sous couverture isolante."
   },
-
-  { 
-    question: "13. Satisfaction : S(x)=−x³ + 4x² + x + 20. Calculer S'(2).", 
-    options: ["5","−5","0","3"], 
-    bonne_reponse: "5", 
-    explication: "S'(2)=−12+16+1=5." 
+  {
+    question: "13. Une tôle chauffée se dilate. Cela signifie que :",
+    options: [
+      "sa masse augmente",
+      "sa longueur augmente",
+      "sa couleur change",
+      "elle devient plus légère"
+    ],
+    correct: 1,
+    explanation: "La dilatation thermique allonge les pièces. En chaudronnerie : prévoir le retrait au refroidissement."
   },
-
-  { 
-    question: "14. Coût marginal : PC(x)=x³ − 2x² − x + 10. Calculer PC'(3).", 
-    options: ["14","10","0","8"], 
-    bonne_reponse: "14", 
-    explication: "PC'(3)=27−12−1=14." 
+  {
+    question: "14. Pourquoi mesure-t-on la température pendant un soudage ?",
+    options: [
+      "pour éviter l’oxydation",
+      "pour contrôler l’apport de chaleur",
+      "pour décorer la pièce",
+      "pour mesurer la masse"
+    ],
+    correct: 1,
+    explanation: "L’apport thermique influence la qualité du cordon. Une surchauffe crée des défauts."
   },
-
-  { 
-    question: "15. Stock critique : I(x)=−2x³ + 9x² − 1x + 50. Calculer I'(1).", 
-    options: ["11","−11","0","5"], 
-    bonne_reponse: "11", 
-    explication: "I'(1)=−6+18−1=11." 
+  {
+    question: "15. Lors d’une solidification, l’énergie thermique :",
+    options: [
+      "est absorbée",
+      "est libérée",
+      "reste constante",
+      "disparaît"
+    ],
+    correct: 1,
+    explanation: "Un corps libère de l’énergie en solidifiant. En atelier : le bain de fusion d’une soudure dégage de la chaleur en se solidifiant."
   },
-
-  { 
-    question: "16. Flux logistique : F(x)=x³ − 9x² + 24x + 10. F'(x) ?", 
-    options: ["3x² − 18x + 24","x² − 18x + 24","3x² − 9x + 24","3x² − 18x + 10"], 
-    bonne_reponse: "3x² − 18x + 24", 
-    explication: "Dérivation terme par terme." 
+  {
+    question: "16. Une pièce métallique froide placée sur une pièce chaude :",
+    options: [
+      "chauffe la pièce chaude",
+      "reste froide",
+      "reçoit de la chaleur",
+      "absorbe la masse"
+    ],
+    correct: 2,
+    explanation: "La chaleur se transfère vers la pièce froide. Exemple : pince métallique refroidissant une zone soudée."
   },
-
-  { 
-    question: "17. Contrôle qualité : C(x)=−x³ + 3x² + 9x + 40. C'(3) ?", 
-    options: ["0","9","−9","3"], 
-    bonne_reponse: "0", 
-    explication: "C'(3)=−27+18+9=0." 
+  {
+    question: "17. Pourquoi agite-t-on l’eau dans un calorimètre ?",
+    options: [
+      "pour dissoudre la glace",
+      "pour homogénéiser la température",
+      "pour accélérer l’évaporation",
+      "pour refroidir le calorimètre"
+    ],
+    correct: 1,
+    explanation: "L’agitation répartit la chaleur. En atelier : brassage du bain de fusion pour uniformiser la température."
   },
-
-  { 
-    question: "18. Livraison : D(x)=2x³ − 15x² + 36x + 5. Racines de D'(x) ?", 
-    options: ["x=2 et x=3","x=1 et x=4","x=−1 et x=3","x=0 et x=6"], 
-    bonne_reponse: "x=2 et x=3", 
-    explication: "D'(x)=6(x−2)(x−3)." 
+  {
+    question: "18. Que devient la masse lors d’un changement d’état ?",
+    options: [
+      "elle augmente",
+      "elle diminue",
+      "elle reste la même",
+      "elle disparaît"
+    ],
+    correct: 2,
+    explanation: "La masse se conserve. En atelier : une tôle fondue garde la même masse."
   },
-
-  { 
-    question: "19. Efficience : E(x)=−x³ + 6x² − 9x + 15. Calculer E'(2).", 
-    options: ["3","−3","0","6"], 
-    bonne_reponse: "3", 
-    explication: "E'(2)=−12+24−9=3." 
+  {
+    question: "19. Quelle est la conséquence d’un chauffage non uniforme ?",
+    options: [
+      "aucun effet",
+      "déformations",
+      "refroidissement rapide",
+      "augmentation de masse"
+    ],
+    correct: 1,
+    explanation: "Les différences de dilatation entraînent des déformations. En chaudronnerie : risque de voilement."
   },
-
-  { 
-    question: "20. Modélisation : M(x)=x³ − x² + 4x + 8. M'(x) ?", 
-    options: ["3x² − 2x + 4","x² − 2x + 4","3x² − x + 4","3x² − 2x"], 
-    bonne_reponse: "3x² − 2x + 4", 
-    explication: "Dérivée : 3x² − 2x + 4." 
+  {
+    question: "20. Pourquoi utilise-t-on un isolant thermique sur une pièce soudée ?",
+    options: [
+      "pour garder la chaleur et éviter les contraintes",
+      "pour décorer",
+      "pour changer la masse",
+      "pour accélérer la fusion"
+    ],
+    correct: 0,
+    explanation: "Limiter le refroidissement brutal réduit les fissures. Même principe qu’un calorimètre qui conserve la chaleur."
   }
 ];
-
 
 /* ============================================================
    =================== AFFICHAGE D'UNE QUESTION ================
