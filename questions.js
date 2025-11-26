@@ -1,11 +1,34 @@
 // =============================
+// GESTION DE SESSION POUR RECOMMENCER LE QUIZ + DETECTION ONGLET
+// =============================
+
+
+// Lors du chargement de la page
+window.addEventListener("load", () => {
+if (sessionStorage.getItem("quizStarted")) {
+resetQuizSession();
+}
+sessionStorage.setItem("quizStarted", "true");
+});
+
+
+// Réinitialisation complète du quiz
+function resetQuizSession() {
+sessionStorage.removeItem("quizStarted");
+sessionStorage.removeItem("currentQuestion");
 sessionStorage.removeItem("score");
 sessionStorage.removeItem("shuffledQuestions");
 window.location.href = "index.html";
 }
 
 
-// Si l'utilisateur change d’onglet → reset immédiat
+// =============================
+// SYSTEME ANTI‑TRICHE RENFORCÉ
+// =============================
+
+
+// 1) Si l'utilisateur change d’onglet → reset immédiat
+// (détection anti-changement d’onglet)
 // (détection anti-changement d’onglet)
 document.addEventListener("visibilitychange", () => {
 if (document.visibilityState === "hidden") {
@@ -13,6 +36,35 @@ resetQuizSession();
 }
 });
 
+
+// 2) Si l’utilisateur minimise la fenêtre ou perd le focus → reset
+window.addEventListener("blur", () => {
+resetQuizSession();
+});
+
+
+// 3) Empêcher le clic droit (inspection ou copie)
+document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+
+// 4) Empêcher F12, Ctrl+Shift+I, Ctrl+U, etc.
+document.addEventListener("keydown", (e) => {
+if (
+e.key === "F12" ||
+(e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) ||
+(e.ctrlKey && e.key === "U")
+) {
+e.preventDefault();
+resetQuizSession();
+}
+});
+
+
+// 5) Exiger le mode plein écran pour continuer
+function goFullScreen() {
+const el = document.documentElement;
+if (el.requestFullscreen) el.requestFullscreen();
+}
 
 /* ============================================================
 =============== VARIABLES GLOBALES ========================
