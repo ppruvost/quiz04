@@ -2,12 +2,12 @@
 // GESTION DE SESSION POUR RECOMMENCER LE QUIZ + DETECTION ONGLET
 // =============================
 
-// Lors du chargement de la page
 window.addEventListener("load", () => {
-    if (sessionStorage.getItem("quizStarted")) {
-        resetQuizSession();
+    loadProgress();
+
+    if (!sessionStorage.getItem("quizStarted")) {
+        sessionStorage.setItem("quizStarted", "true");
     }
-    sessionStorage.setItem("quizStarted", "true");
 });
 
 // Réinitialisation complète du quiz
@@ -57,18 +57,16 @@ function goFullScreen() {
 }
 
 /* ============================================================
-=============== VARIABLES GLOBALES ========================
+================ VARIABLES GLOBALES ========================
 ============================================================ */
-
 let user = { nom: "", prenom: "" };
 let current = 0;
 let score = 0;
 let shuffledQuestions = [];
 
 /* ============================================================
-=============== MÉLANGE DE TABLEAUX =======================
+================ MÉLANGE DE TABLEAUX =======================
 ============================================================ */
-
 function shuffleArray(arr) {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
@@ -78,7 +76,6 @@ function shuffleArray(arr) {
     return a;
 }
 
-// Mélange questions + réponses
 function shuffleQuestions() {
     return questions.map((q) => ({
         ...q,
@@ -86,6 +83,21 @@ function shuffleQuestions() {
     }));
 }
 
+/* ============================================================
+================= SAUVEGARDE ET CHARGEMENT ===================
+============================================================ */
+function saveProgress() {
+    sessionStorage.setItem("currentQuestion", current);
+    sessionStorage.setItem("score", score);
+    sessionStorage.setItem("shuffledQuestions", JSON.stringify(shuffledQuestions));
+}
+
+function loadProgress() {
+    current = parseInt(sessionStorage.getItem("currentQuestion")) || 0;
+    score = parseInt(sessionStorage.getItem("score")) || 0;
+    const savedQuestions = sessionStorage.getItem("shuffledQuestions");
+    if (savedQuestions) shuffledQuestions = JSON.parse(savedQuestions);
+}
 /* ============================================================
    ====================  LISTE DES QUESTIONS  ==================
    ============================================================ */
@@ -311,13 +323,42 @@ const questions = [
 /* ============================================================
 ===================== AFFICHAGE DES QUESTIONS =================
 ============================================================ */
+function showCorrectAnswer(questionObj) {
+    const buttons = document.querySelectorAll('.answer-btn');
+
+    buttons.forEach(btn => {
+        const index = parseInt(btn.dataset.index);
+
+        if (index === questionObj.correct) {
+            btn.style.border = "4px solid #00ff00";
+            btn.style.boxShadow = "0 0 18px #00ff00";
+        } else {
+            btn.style.opacity = "0.5";
+        }
+
+        btn.disabled = true; // Empêche plusieurs clics
+    });
+
+    // Message pédagogique
+    const info = document.createElement("div");
+    info.className = "explanation";
+    info.innerHTML = `
+        <p><strong>Bonne réponse :</strong> ${questionObj.options[questionObj.correct]}</p>
+        <p>${questionObj.explanation}</p>
+    `;
+    document.querySelector("#quiz-container").appendChild(info);
+
+    setTimeout(() => {
+        info.remove();
+        loadNextQuestion();
+    }, 2500);
+}
 
 function showQuestion() {
     const q = shuffledQuestions[current];
 
     document.getElementById("quiz").innerHTML = `
         <h2>${q.question}</h2>
-
         <div id="options" class="answer-grid">
             ${q.options
                 .map(
@@ -330,56 +371,58 @@ function showQuestion() {
                 )
                 .join("")}
         </div>
-
         <p id="score">Score actuel : ${score} / ${shuffledQuestions.length}</p>
     `;
 
     document.querySelectorAll(".answer-btn").forEach((btn) => {
-        btn.addEventListener("click", () => selectAnswer(btn, q.correct));
+        btn.addEventListener("click", () => selectAnswer(btn, q));
     });
 }
 
 /* ============================================================
-====================== SELECTION DE REPONSE ====================
+================= SELECTION DE REPONSE =======================
 ============================================================ */
-
-function selectAnswer(btn, correctIndex) {
+function selectAnswer(btn, questionObj) {
     const index = parseInt(btn.dataset.index);
 
-    if (index === correctIndex) {
+    if (index === questionObj.correct) {
         btn.classList.add("correct");
         score++;
     } else {
         btn.classList.add("wrong");
     }
 
+    saveProgress(); // Sauvegarde après chaque réponse
+
     document.getElementById("score").innerText =
         `Score actuel : ${score} / ${shuffledQuestions.length}`;
 
-    current++;
+    showCorrectAnswer(questionObj);
+}
 
+function loadNextQuestion() {
+    current++;
     if (current < shuffledQuestions.length) {
-        setTimeout(showQuestion, 2500);
+        showQuestion();
     } else {
-        setTimeout(endQuiz, 2500);
+        endQuiz();
     }
 }
 
 /* ============================================================
 ======================== FIN DU QUIZ ========================
 ============================================================ */
-
 function endQuiz() {
     document.getElementById("quiz").innerHTML = `
         <h2>Quiz terminé !</h2>
         <p>Score final : ${score} / ${shuffledQuestions.length}</p>
     `;
+    sessionStorage.clear();
 }
 
 /* ============================================================
 ====================== LANCEMENT DU QUIZ ====================
 ============================================================ */
-
 document.getElementById("startQuiz").addEventListener("click", () => {
     const nom = document.getElementById("nom").value.trim();
     const prenom = document.getElementById("prenom").value.trim();
@@ -395,6 +438,9 @@ document.getElementById("startQuiz").addEventListener("click", () => {
     shuffledQuestions = shuffleQuestions();
     current = 0;
     score = 0;
+
+    saveProgress();
+    goFullScreen();
 
     document.getElementById("userForm").style.display = "none";
     document.getElementById("quiz").style.display = "block";
