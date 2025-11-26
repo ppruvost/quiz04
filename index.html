@@ -2,20 +2,24 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Quiz - Température, chaleur et Changement d'état (Seconde Pro REMI)</title>
+  <title>Quiz - Température, chaleur et changement d'état (Seconde Pro REMI)</title>
 
   <!-- Police DYS-friendly -->
   <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 
   <!-- Confettis -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <!-- EmailJS -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 
 <body>
+  <audio id="bgMusic" loop>
+    <source src="musique.mp3" type="audio/mp3">
+  </audio>
+
   <div class="container" id="container">
     <h1 data-title="Mesurer des températures">
       Application au contexte professionnel
@@ -34,14 +38,14 @@
       <button class="button start" id="startQuiz">🎮 Commencer le quiz</button>
     </div>
 
-    <!-- ZONE DU QUIZ -->
+    <!-- Zone du quiz -->
     <div id="quiz" class="hidden"></div>
 
     <div id="explication" class="explication"></div>
     <p id="score" class="score"></p>
   </div>
 
-  <!-- SON DE VICTOIRE -->
+  <!-- Son de victoire -->
   <audio id="victorySound" src="jingle.wav" preload="auto"></audio>
 
   <!-- Scripts -->
@@ -49,4 +53,3 @@
   <script src="envoi.js"></script>
 </body>
 </html>
-
