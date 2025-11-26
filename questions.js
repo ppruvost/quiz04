@@ -2,104 +2,88 @@
 // GESTION DE SESSION POUR RECOMMENCER LE QUIZ + DETECTION ONGLET
 // =============================
 
-
 // Lors du chargement de la page
 window.addEventListener("load", () => {
-if (sessionStorage.getItem("quizStarted")) {
-resetQuizSession();
-}
-sessionStorage.setItem("quizStarted", "true");
+    if (sessionStorage.getItem("quizStarted")) {
+        resetQuizSession();
+    }
+    sessionStorage.setItem("quizStarted", "true");
 });
-
 
 // Réinitialisation complète du quiz
 function resetQuizSession() {
-sessionStorage.removeItem("quizStarted");
-sessionStorage.removeItem("currentQuestion");
-sessionStorage.removeItem("score");
-sessionStorage.removeItem("shuffledQuestions");
-window.location.href = "index.html";
+    sessionStorage.removeItem("quizStarted");
+    sessionStorage.removeItem("currentQuestion");
+    sessionStorage.removeItem("score");
+    sessionStorage.removeItem("shuffledQuestions");
+    window.location.href = "index.html";
 }
 
-
 // =============================
-// SYSTEME ANTI‑TRICHE RENFORCÉ
+// SYSTEME ANTI-TRICHE RENFORCÉ
 // =============================
-
 
 // 1) Si l'utilisateur change d’onglet → reset immédiat
-// (détection anti-changement d’onglet)
-// (détection anti-changement d’onglet)
 document.addEventListener("visibilitychange", () => {
-if (document.visibilityState === "hidden") {
-resetQuizSession();
-}
+    if (document.visibilityState === "hidden") {
+        resetQuizSession();
+    }
 });
-
 
 // 2) Si l’utilisateur minimise la fenêtre ou perd le focus → reset
 window.addEventListener("blur", () => {
-resetQuizSession();
+    resetQuizSession();
 });
 
-
-// 3) Empêcher le clic droit (inspection ou copie)
+// 3) Empêcher le clic droit
 document.addEventListener("contextmenu", (e) => e.preventDefault());
-
 
 // 4) Empêcher F12, Ctrl+Shift+I, Ctrl+U, etc.
 document.addEventListener("keydown", (e) => {
-if (
-e.key === "F12" ||
-(e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) ||
-(e.ctrlKey && e.key === "U")
-) {
-e.preventDefault();
-resetQuizSession();
-}
+    if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) ||
+        (e.ctrlKey && e.key === "U")
+    ) {
+        e.preventDefault();
+        resetQuizSession();
+    }
 });
 
-
-// 5) Exiger le mode plein écran pour continuer
+// 5) Exiger le plein écran
 function goFullScreen() {
-const el = document.documentElement;
-if (el.requestFullscreen) el.requestFullscreen();
+    const el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen();
 }
 
 /* ============================================================
 =============== VARIABLES GLOBALES ========================
 ============================================================ */
 
-
 let user = { nom: "", prenom: "" };
 let current = 0;
 let score = 0;
 let shuffledQuestions = [];
 
-
-
-
 /* ============================================================
 =============== MÉLANGE DE TABLEAUX =======================
 ============================================================ */
 
-
 function shuffleArray(arr) {
-const a = [...arr];
-for (let i = a.length - 1; i > 0; i--) {
-const j = Math.floor(Math.random() * (i + 1));
-[a[i], a[j]] = [a[j], a[i]];
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
 }
-return a;
-}
-
 
 // Mélange questions + réponses
 function shuffleQuestions() {
-return questions.map((q) => ({
-...q,
-options: shuffleArray(q.options)
-}));
+    return questions.map((q) => ({
+        ...q,
+        options: shuffleArray(q.options)
+    }));
 }
 
 /* ============================================================
@@ -325,70 +309,95 @@ const questions = [
 ];
 
 /* ============================================================
-});
+===================== AFFICHAGE DES QUESTIONS =================
+============================================================ */
+
+function showQuestion() {
+    const q = shuffledQuestions[current];
+
+    document.getElementById("quiz").innerHTML = `
+        <h2>${q.question}</h2>
+
+        <div id="options" class="answer-grid">
+            ${q.options
+                .map(
+                    (opt, index) => `
+                <button class="answer-btn color-${index}" data-index="${index}">
+                    <span class="shape shape-${index}"></span>
+                    ${opt}
+                </button>
+            `
+                )
+                .join("")}
+        </div>
+
+        <p id="score">Score actuel : ${score} / ${shuffledQuestions.length}</p>
+    `;
+
+    document.querySelectorAll(".answer-btn").forEach((btn) => {
+        btn.addEventListener("click", () => selectAnswer(btn, q.correct));
+    });
 }
 
+/* ============================================================
+====================== SELECTION DE REPONSE ====================
+============================================================ */
 
-document.getElementById("score").innerText =
-`Score actuel : ${score} / ${shuffledQuestions.length}`;
+function selectAnswer(btn, correctIndex) {
+    const index = parseInt(btn.dataset.index);
 
+    if (index === correctIndex) {
+        btn.classList.add("correct");
+        score++;
+    } else {
+        btn.classList.add("wrong");
+    }
 
-current++;
+    document.getElementById("score").innerText =
+        `Score actuel : ${score} / ${shuffledQuestions.length}`;
 
+    current++;
 
-if (current < shuffledQuestions.length) {
-setTimeout(showQuestion, 2500);
-} else {
-setTimeout(endQuiz, 2500);
+    if (current < shuffledQuestions.length) {
+        setTimeout(showQuestion, 2500);
+    } else {
+        setTimeout(endQuiz, 2500);
+    }
 }
-}, 300);
-}
-
-
-
 
 /* ============================================================
 ======================== FIN DU QUIZ ========================
 ============================================================ */
 
-
 function endQuiz() {
-document.getElementById("quiz").innerHTML = `
-<h2>Quiz terminé !</h2>
-<p>Score final : ${score} / ${shuffledQuestions.length}</p>`;
+    document.getElementById("quiz").innerHTML = `
+        <h2>Quiz terminé !</h2>
+        <p>Score final : ${score} / ${shuffledQuestions.length}</p>
+    `;
 }
-
-
-
 
 /* ============================================================
 ====================== LANCEMENT DU QUIZ ====================
 ============================================================ */
 
-
 document.getElementById("startQuiz").addEventListener("click", () => {
-const nom = document.getElementById("nom").value.trim();
-const prenom = document.getElementById("prenom").value.trim();
+    const nom = document.getElementById("nom").value.trim();
+    const prenom = document.getElementById("prenom").value.trim();
 
+    if (!nom || !prenom) {
+        alert("Merci de renseigner votre nom et prénom avant de commencer.");
+        return;
+    }
 
-if (!nom || !prenom) {
-alert("Merci de renseigner votre nom et prénom avant de commencer.");
-return;
-}
+    user.nom = nom;
+    user.prenom = prenom;
 
+    shuffledQuestions = shuffleQuestions();
+    current = 0;
+    score = 0;
 
-user.nom = nom;
-user.prenom = prenom;
+    document.getElementById("userForm").style.display = "none";
+    document.getElementById("quiz").style.display = "block";
 
-
-shuffledQuestions = shuffleQuestions();
-current = 0;
-score = 0;
-
-
-document.getElementById("userForm").style.display = "none";
-document.getElementById("quiz").style.display = "block";
-
-
-showQuestion();
+    showQuestion();
 });
