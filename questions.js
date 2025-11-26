@@ -76,11 +76,17 @@ function shuffleArray(arr) {
     return a;
 }
 
+// 🔥 VERSION CORRIGÉE — conserve la bonne réponse même après mélange
 function shuffleQuestions() {
-    return questions.map((q) => ({
-        ...q,
-        options: shuffleArray(q.options)
-    }));
+    return questions.map((q) => {
+        const shuffledOptions = shuffleArray(q.options);
+
+        return {
+            ...q,
+            options: shuffledOptions,
+            correct: shuffledOptions.indexOf(q.options[q.correct]) // nouvelle position correcte
+        };
+    });
 }
 
 /* ============================================================
@@ -336,10 +342,9 @@ function showCorrectAnswer(questionObj) {
             btn.style.opacity = "0.5";
         }
 
-        btn.disabled = true; // Empêche plusieurs clics
+        btn.disabled = true;
     });
 
-    // Message pédagogique
     const info = document.createElement("div");
     info.className = "explanation";
     info.innerHTML = `
@@ -392,7 +397,7 @@ function selectAnswer(btn, questionObj) {
         btn.classList.add("wrong");
     }
 
-    saveProgress(); // Sauvegarde après chaque réponse
+    saveProgress();
 
     document.getElementById("score").innerText =
         `Score actuel : ${score} / ${shuffledQuestions.length}`;
