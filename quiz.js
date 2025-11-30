@@ -1,42 +1,31 @@
-// quiz.js
-
 // =============================
 // GESTION DE SESSION POUR RECOMMENCER LE QUIZ
 // =============================
 
 window.addEventListener("load", () => {
     if (sessionStorage.getItem("quizStarted")) {
-        // L'utilisateur est revenu alors qu'une session existait → reset complet
         resetQuizSession();
     }
-
-    // Marque que le quiz est lancé dans cet onglet
     sessionStorage.setItem("quizStarted", "true");
 });
 
-// Réinitialisation complète du quiz
 function resetQuizSession() {
     sessionStorage.removeItem("quizStarted");
     sessionStorage.removeItem("currentQuestion");
     sessionStorage.removeItem("score");
     sessionStorage.removeItem("shuffledQuestions");
-
-    // Retour page d’accueil du quiz
     window.location.href = "index.html";
 }
+
 // =============================
 // SYSTEME ANTI-TRICHE RENFORCÉ
 // =============================
 
 document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") {
-        resetQuizSession();
-    }
+    if (document.visibilityState === "hidden") resetQuizSession();
 });
 
-window.addEventListener("blur", () => {
-    resetQuizSession();
-});
+window.addEventListener("blur", () => resetQuizSession());
 
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 
@@ -63,16 +52,10 @@ function goFullScreen() {
 
 function startMusic() {
     const audio = document.getElementById("bgMusic");
-    
-    // Définir le volume et lancer la musique si le navigateur le permet
     audio.volume = 0.4;
-    
-    // Enlever le mute (pour permettre l'écoute une fois la page chargée)
     audio.muted = false;
-    
-    // Essayer de jouer la musique dès que possible
-    audio.play().catch((error) => {
-        console.log("Lecture automatique échouée, mais la musique est prête.");
+    audio.play().catch(() => {
+        console.log("Lecture automatique échouée, musique prête.");
     });
 }
 
@@ -83,13 +66,17 @@ function stopMusic() {
 }
 
 /* ============================================================
-============== VARIABLE GLOBALES ==============================
+============== VARIABLES GLOBALES ============================
 ============================================================ */
 
 let user = { nom: "", prenom: "" };
 let current = 0;
 let score = 0;
 let shuffledQuestions = [];
+
+// Délais personnalisés
+const delayCorrect = 8000; // 8 sec pour la bonne réponse
+const delayWrong = 6000;   // 6 sec pour la mauvaise réponse
 
 // Mélange de tableaux
 function shuffleArray(arr) {
@@ -130,6 +117,12 @@ function showQuestion() {
     `;
 }
 
+// Surlignage de la réponse
+function highlightAnswer(inputElem, isCorrect) {
+    const label = inputElem.nextElementSibling;
+    label.classList.add(isCorrect ? "answer-correct" : "answer-wrong");
+}
+
 // Validation de la réponse
 function validateAnswer() {
     const selected = document.querySelector(`input[name="q${current}"]:checked`);
@@ -140,39 +133,46 @@ function validateAnswer() {
 
     const q = shuffledQuestions[current];
     const userAnswer = selected.value;
-    const label = selected.nextElementSibling;
+    selected.nextElementSibling.classList.add("answer-selected");
 
-    label.classList.add("answer-selected");
+    if (userAnswer === q.bonne_reponse) {
+        score++;
+        highlightAnswer(selected, true);
+        document.getElementById("explication").innerHTML =
+            `<span class='success'>Bonne réponse !</span> ${q.explication}`;
 
-    setTimeout(() => {
-        if (userAnswer === q.bonne_reponse) {
-            score++;
-            label.classList.add("answer-correct");
-            document.getElementById("explication").innerHTML =
-                `<span class='success'>Bonne réponse !</span> ${q.explication}`;
-        } else {
-            label.classList.add("answer-wrong");
-            document.getElementById("explication").innerHTML =
-                `<span class='fail'>Mauvaise réponse.</span> ${q.explication}`;
+        setTimeout(() => {
+            nextQuestion();
+        }, delayCorrect);
+    } else {
+        highlightAnswer(selected, false);
+        document.getElementById("explication").innerHTML =
+            `<span class='fail'>Mauvaise réponse.</span> ${q.explication}`;
 
-            document.querySelectorAll(`input[name="q${current}"]`).forEach((input) => {
-                if (input.value === q.bonne_reponse) {
-                    input.nextElementSibling.classList.add("answer-correct-auto");
-                }
-            });
-        }
+        // Surligner automatiquement la bonne réponse
+        document.querySelectorAll(`input[name="q${current}"]`).forEach((input) => {
+            if (input.value === q.bonne_reponse) {
+                input.nextElementSibling.classList.add("answer-correct-auto");
+            }
+        });
 
-        document.getElementById("score").innerText =
-            `Score actuel : ${score} / ${shuffledQuestions.length}`;
+        setTimeout(() => {
+            nextQuestion();
+        }, delayWrong);
+    }
 
-        current++;
+    document.getElementById("score").innerText =
+        `Score actuel : ${score} / ${shuffledQuestions.length}`;
+}
 
-        if (current < shuffledQuestions.length) {
-            setTimeout(showQuestion, 2500);
-        } else {
-            setTimeout(endQuiz, 2500);
-        }
-    }, 300);
+// Passage à la question suivante
+function nextQuestion() {
+    current++;
+    if (current < shuffledQuestions.length) {
+        showQuestion();
+    } else {
+        endQuiz();
+    }
 }
 
 // Fin du quiz
@@ -184,7 +184,7 @@ function endQuiz() {
 
 // Lancement du quiz
 document.getElementById("startQuiz").addEventListener("click", () => {
-    startMusic(); // <-- la musique démarre au moment où l'utilisateur clique
+    startMusic();
     const nom = document.getElementById("nom").value.trim();
     const prenom = document.getElementById("prenom").value.trim();
 
@@ -195,7 +195,6 @@ document.getElementById("startQuiz").addEventListener("click", () => {
 
     user.nom = nom;
     user.prenom = prenom;
-
     shuffledQuestions = shuffleQuestions();  
     current = 0;
     score = 0;
