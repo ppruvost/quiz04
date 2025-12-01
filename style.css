@@ -84,33 +84,33 @@ h2 {
    TIMER
 =============================== */
 #timer-container {
-    position: relative;
-    width: 80px;
-    height: 80px;
-    margin: 20px auto;
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 20px auto;
 }
 
 #timer-svg {
-    transform: rotate(-90deg);
+  transform: rotate(-90deg);
 }
 
 #timer-circle {
-    fill: none;
-    stroke: #ff4444;
-    stroke-width: 6;
-    stroke-linecap: round;
-    stroke-dasharray: 220; /* périmètre du cercle */
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1s linear;
+  fill: none;
+  stroke: #ff4444;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 220; /* périmètre du cercle */
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear;
 }
 
 #timer-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 22px;
-    font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 22px;
+  font-weight: bold;
 }
 
 /* ===============================
@@ -123,7 +123,7 @@ h2 {
   color: #1b2763;
 }
 
-/* ANIMATION entrée question */
+/* Animation d'entrée */
 .pop-in {
   animation: popIn 0.45s ease;
 }
@@ -137,7 +137,6 @@ h2 {
 /* ===============================
    OPTIONS (style Kahoot)
 =============================== */
-
 .options {
   margin-top: 20px;
 }
@@ -155,23 +154,20 @@ h2 {
   position: relative;
 }
 
-/* effet hover */
 .options label.option-card:hover {
   background: #d7ddff;
 }
 
-/* rendre visible les radios */
+/* radios visibles */
 input[type="radio"] {
-  transform: scale(1.5);     /* plus gros */
-  margin-right: 12px;        /* espace */
+  transform: scale(1.5);
+  margin-right: 12px;
   cursor: pointer;
 }
 
 /* ===============================
-   ANIMATIONS DE VALIDATION KAHOOT
+   ANIMATIONS VALIDATION KAHOOT
 =============================== */
-
-/* clic → effet pulsation */
 .answer-selected {
   animation: pulse 0.3s ease;
 }
@@ -182,7 +178,7 @@ input[type="radio"] {
   100% { transform: scale(1); }
 }
 
-/* BONNE réponse (vert) */
+/* BONNE réponse */
 .answer-correct,
 .answer-correct-auto {
   background: #9af5a3 !important;
@@ -191,11 +187,11 @@ input[type="radio"] {
 }
 
 @keyframes flashGreen {
-  0% { box-shadow: 0 0 0px rgba(43,138,62,0.1); }
+  0% { box-shadow: 0 0 0 rgba(43,138,62,0.1); }
   100% { box-shadow: 0 0 18px rgba(43,138,62,0.6); }
 }
 
-/* MAUVAISE réponse (rouge) */
+/* MAUVAISE réponse */
 .answer-wrong {
   background: #ffb3b3 !important;
   border-color: #c62828 !important;
@@ -203,7 +199,7 @@ input[type="radio"] {
 }
 
 @keyframes flashRed {
-  0% { box-shadow: 0 0 0px rgba(198,40,40,0.1); }
+  0% { box-shadow: 0 0 0 rgba(198,40,40,0.1); }
   100% { box-shadow: 0 0 18px rgba(198,40,40,0.6); }
 }
 
@@ -211,17 +207,18 @@ input[type="radio"] {
    BOUTONS
 =============================== */
 button.validate {
-    font-size: 1.4em;
-    padding: 18px 28px;
-    border-radius: 14px;
-    background: #5c7dff;
-    color: white;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 20px;
+  font-size: 1.4em;
+  padding: 18px 28px;
+  border-radius: 14px;
+  background: #5c7dff;
+  color: white;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
 }
+
 button.validate:hover {
-    background: #455ecc;
+  background: #455ecc;
 }
 
 .button {
@@ -278,7 +275,7 @@ button.validate:hover {
   display: none;
 }
 
-/* fade général */
+/* Fade global */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
