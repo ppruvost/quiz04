@@ -67,42 +67,57 @@ function stopMusic() {
     audio.currentTime = 0;
 }
 
-/* ============================================================
-============== TIMER ==========================================
-============================================================ */
-let timer;
-const TIME_LIMIT = 30;
+/* ============================================
+   TIMER ANIMÉ (CERCLE QUI SE VIDE)
+============================================ */
 
-function startTimer(onTimeUp) {
-    let timeLeft = TIME_LIMIT;
+let timerInterval;
+let timeLeft = 30;
+const FULL_DASH = 220; // périmètre du cercle
 
-    const circle = document.getElementById("timer-circle");
-    const timerText = document.getElementById("timer-text");
+function startTimer() {
+    timeLeft = 30;
+    updateTimerText(timeLeft);
+    updateCircle(timeLeft);
 
-    const totalLength = 220;
-    circle.style.strokeDasharray = totalLength;
-
-    // Reset timer visuals
-    circle.style.strokeDashoffset = 0;
-    timerText.textContent = timeLeft;
-
-    clearInterval(timer);
-
-    timer = setInterval(() => {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
         timeLeft--;
-        timerText.textContent = timeLeft;
-
-        const offset = totalLength - (timeLeft / TIME_LIMIT) * totalLength;
-        circle.style.strokeDashoffset = offset;
+        updateTimerText(timeLeft);
+        updateCircle(timeLeft);
 
         if (timeLeft <= 0) {
-            clearInterval(timer);
-            timerText.textContent = "0";
-            circle.style.strokeDashoffset = totalLength;
-
-            if (typeof onTimeUp === "function") onTimeUp();
+            clearInterval(timerInterval);
+            autoValidateAndNext();
         }
     }, 1000);
+}
+
+function updateTimerText(value) {
+    const timerText = document.getElementById("timer-text");
+    if (timerText) {
+        timerText.textContent = value;
+    }
+}
+
+function updateCircle(secondsLeft) {
+    const circle = document.getElementById("timer-circle");
+    if (!circle) return;
+
+    const ratio = (30 - secondsLeft) / 30;
+    const offset = FULL_DASH * ratio;
+    circle.style.strokeDashoffset = offset;
+}
+
+function autoValidateAndNext() {
+    const correctOption = document.querySelector("[data-correct='true']");
+    if (correctOption) {
+        correctOption.classList.add("answer-correct-auto");
+    }
+
+    setTimeout(() => {
+        nextQuestion(); // correction
+    }, 1500);
 }
 
 /* ============================================================
@@ -147,10 +162,14 @@ function showQuestion() {
     const optionsHTML = question.options
         .map((option, index) => {
             const inputId = `q${current}_opt${index}`;
+
+            // marquer la bonne réponse pour auto highlight
+            const correctAttr = option === question.bonne_reponse ? "data-correct='true'" : "";
+
             return `
                 <div class="option-container">
                     <input type="radio" id="${inputId}" name="q${current}" value="${option}">
-                    <label for="${inputId}">${option}</label>
+                    <label ${correctAttr} for="${inputId}">${option}</label>
                 </div>
             `;
         })
@@ -162,6 +181,9 @@ function showQuestion() {
         <button class="validate" onclick="validateAnswer()">Valider</button>
         <div id="explication"></div>
     `;
+
+    // 🔥 Lancement du timer à chaque nouvelle question
+    startTimer();
 }
 
 /* ============================================================
@@ -182,6 +204,8 @@ function validateAnswer() {
         return;
     }
 
+    clearInterval(timerInterval); // stop timer si réponse humaine
+
     const q = shuffledQuestions[current];
     const userAnswer = selected.value;
 
@@ -201,7 +225,6 @@ function validateAnswer() {
         document.getElementById("explication").innerHTML =
             `<span class="fail">Mauvaise réponse.</span> ${q.explication}`;
 
-        // Affichage de la bonne réponse
         document
             .querySelectorAll(`input[name="q${current}"]`)
             .forEach((input) => {
@@ -239,6 +262,8 @@ function endQuiz() {
         <h2>Quiz terminé !</h2>
         <p>Score final : ${score} / ${shuffledQuestions.length}</p>
     `;
+
+    stopMusic();
 }
 
 /* ============================================================
