@@ -33,27 +33,27 @@
 
       <button class="button start" id="startQuiz">🎮 Commencer le quiz</button>
     </div>
-    
+
     <!-- SON PENDANT LE QUIZ -->
     <audio id="bgMusic" src="musique.mp3" loop></audio>
-    
+
     <!-- ZONE DU QUIZ -->
     <div id="quiz" class="hidden"></div>
 
-    <div id="explication" class="explication"></div>
     <p id="score" class="score"></p>
+
+    <!-- TIMER (placé dans la zone du quiz pour cohérence) -->
+    <div id="timer-container">
+      <svg id="timer-svg" width="80" height="80">
+        <circle id="timer-circle" cx="40" cy="40" r="35"></circle>
+      </svg>
+      <div id="timer-text">30</div>
+    </div>
+
   </div>
 
   <!-- SON DE VICTOIRE -->
   <audio id="victorySound" src="jingle.wav" preload="auto"></audio>
-
-  <!-- TIMER -->
-  <div id="timer-container">
-    <svg id="timer-svg" width="80" height="80">
-      <circle id="timer-circle" cx="40" cy="40" r="35"></circle>
-    </svg>
-    <div id="timer-text">30</div>
-  </div>
 
   <!-- Scripts -->
   <script src="questions.js" defer></script>
@@ -61,4 +61,3 @@
   <script src="envoi.js" defer></script>
 </body>
 </html>
-
