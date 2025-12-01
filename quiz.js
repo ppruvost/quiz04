@@ -25,16 +25,17 @@ document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") resetQuizSession();
 });
 
-window.addEventListener("blur", () => resetQuizSession());
+window.addEventListener("blur", resetQuizSession);
 
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 
 document.addEventListener("keydown", (e) => {
-    if (
+    const blocked =
         e.key === "F12" ||
         (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) ||
-        (e.ctrlKey && e.key === "U")
-    ) {
+        (e.ctrlKey && e.key === "U");
+
+    if (blocked) {
         e.preventDefault();
         resetQuizSession();
     }
@@ -54,8 +55,9 @@ function startMusic() {
     const audio = document.getElementById("bgMusic");
     audio.volume = 0.4;
     audio.muted = false;
+
     audio.play().catch(() => {
-        console.log("Lecture automatique échouée, musique prête.");
+        console.log("Lecture automatique impossible — action utilisateur requise !");
     });
 }
 
@@ -63,6 +65,44 @@ function stopMusic() {
     const audio = document.getElementById("bgMusic");
     audio.pause();
     audio.currentTime = 0;
+}
+
+/* ============================================================
+============== TIMER ==========================================
+============================================================ */
+let timer;
+const TIME_LIMIT = 30;
+
+function startTimer(onTimeUp) {
+    let timeLeft = TIME_LIMIT;
+
+    const circle = document.getElementById("timer-circle");
+    const timerText = document.getElementById("timer-text");
+
+    const totalLength = 220;
+    circle.style.strokeDasharray = totalLength;
+
+    // Reset timer visuals
+    circle.style.strokeDashoffset = 0;
+    timerText.textContent = timeLeft;
+
+    clearInterval(timer);
+
+    timer = setInterval(() => {
+        timeLeft--;
+        timerText.textContent = timeLeft;
+
+        const offset = totalLength - (timeLeft / TIME_LIMIT) * totalLength;
+        circle.style.strokeDashoffset = offset;
+
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            timerText.textContent = "0";
+            circle.style.strokeDashoffset = totalLength;
+
+            if (typeof onTimeUp === "function") onTimeUp();
+        }
+    }, 1000);
 }
 
 /* ============================================================
@@ -74,11 +114,13 @@ let current = 0;
 let score = 0;
 let shuffledQuestions = [];
 
-// Délais personnalisés
-const delayCorrect = 8000; // 8 sec pour la bonne réponse
-const delayWrong = 6000;   // 6 sec pour la mauvaise réponse
+const delayCorrect = 8000;
+const delayWrong = 6000;
 
-// Mélange de tableaux
+/* ============================================================
+============== FONCTIONS UTILITAIRES ==========================
+============================================================ */
+
 function shuffleArray(arr) {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
@@ -88,7 +130,6 @@ function shuffleArray(arr) {
     return a;
 }
 
-// Mélange questions + réponses
 function shuffleQuestions() {
     return questions.map((q) => ({
         ...q,
@@ -96,18 +137,24 @@ function shuffleQuestions() {
     }));
 }
 
-// Affichage d'une question
+/* ============================================================
+============== AFFICHAGE QUESTIONS ============================
+============================================================ */
+
 function showQuestion() {
     const question = shuffledQuestions[current];
-    let optionsHTML = question.options.map((option, index) => {
-        const inputId = `q${current}_opt${index}`;
-        return `
-            <div class="option-container">
-                <input type="radio" id="${inputId}" name="q${current}" value="${option}">
-                <label for="${inputId}">${option}</label>
-            </div>
-        `;
-    }).join('');
+
+    const optionsHTML = question.options
+        .map((option, index) => {
+            const inputId = `q${current}_opt${index}`;
+            return `
+                <div class="option-container">
+                    <input type="radio" id="${inputId}" name="q${current}" value="${option}">
+                    <label for="${inputId}">${option}</label>
+                </div>
+            `;
+        })
+        .join("");
 
     document.getElementById("quiz").innerHTML = `
         <h2>${question.question}</h2>
@@ -117,55 +164,63 @@ function showQuestion() {
     `;
 }
 
-// Surlignage de la réponse
+/* ============================================================
+============== VALIDATION REPONSE =============================
+============================================================ */
+
 function highlightAnswer(inputElem, isCorrect) {
     const label = inputElem.nextElementSibling;
     label.classList.add(isCorrect ? "answer-correct" : "answer-wrong");
 }
 
-// Validation de la réponse
 function validateAnswer() {
     const selected = document.querySelector(`input[name="q${current}"]:checked`);
+
     if (!selected) {
-        document.getElementById("explication").innerHTML = "Veuillez sélectionner une réponse.";
+        document.getElementById("explication").textContent =
+            "Veuillez sélectionner une réponse.";
         return;
     }
 
     const q = shuffledQuestions[current];
     const userAnswer = selected.value;
+
     selected.nextElementSibling.classList.add("answer-selected");
 
     if (userAnswer === q.bonne_reponse) {
         score++;
         highlightAnswer(selected, true);
-        document.getElementById("explication").innerHTML =
-            `<span class='success'>Bonne réponse !</span> ${q.explication}`;
 
-        setTimeout(() => {
-            nextQuestion();
-        }, delayCorrect);
+        document.getElementById("explication").innerHTML =
+            `<span class="success">Bonne réponse !</span> ${q.explication}`;
+
+        setTimeout(nextQuestion, delayCorrect);
     } else {
         highlightAnswer(selected, false);
+
         document.getElementById("explication").innerHTML =
-            `<span class='fail'>Mauvaise réponse.</span> ${q.explication}`;
+            `<span class="fail">Mauvaise réponse.</span> ${q.explication}`;
 
-        // Surligner automatiquement la bonne réponse
-        document.querySelectorAll(`input[name="q${current}"]`).forEach((input) => {
-            if (input.value === q.bonne_reponse) {
-                input.nextElementSibling.classList.add("answer-correct-auto");
-            }
-        });
+        // Affichage de la bonne réponse
+        document
+            .querySelectorAll(`input[name="q${current}"]`)
+            .forEach((input) => {
+                if (input.value === q.bonne_reponse) {
+                    input.nextElementSibling.classList.add("answer-correct-auto");
+                }
+            });
 
-        setTimeout(() => {
-            nextQuestion();
-        }, delayWrong);
+        setTimeout(nextQuestion, delayWrong);
     }
 
     document.getElementById("score").innerText =
         `Score actuel : ${score} / ${shuffledQuestions.length}`;
 }
 
-// Passage à la question suivante
+/* ============================================================
+============== NAVIGATION QUESTIONS ===========================
+============================================================ */
+
 function nextQuestion() {
     current++;
     if (current < shuffledQuestions.length) {
@@ -175,16 +230,24 @@ function nextQuestion() {
     }
 }
 
-// Fin du quiz
+/* ============================================================
+============== FIN DU QUIZ ====================================
+============================================================ */
+
 function endQuiz() {
     document.getElementById("quiz").innerHTML = `
         <h2>Quiz terminé !</h2>
-        <p>Score final : ${score} / ${shuffledQuestions.length}</p>`;
+        <p>Score final : ${score} / ${shuffledQuestions.length}</p>
+    `;
 }
 
-// Lancement du quiz
+/* ============================================================
+============== LANCEMENT QUIZ =================================
+============================================================ */
+
 document.getElementById("startQuiz").addEventListener("click", () => {
     startMusic();
+
     const nom = document.getElementById("nom").value.trim();
     const prenom = document.getElementById("prenom").value.trim();
 
@@ -193,9 +256,8 @@ document.getElementById("startQuiz").addEventListener("click", () => {
         return;
     }
 
-    user.nom = nom;
-    user.prenom = prenom;
-    shuffledQuestions = shuffleQuestions();  
+    user = { nom, prenom };
+    shuffledQuestions = shuffleQuestions();
     current = 0;
     score = 0;
 
