@@ -81,6 +81,39 @@ h2 {
 }
 
 /* ===============================
+   TIMER
+=============================== */
+#timer-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 20px auto;
+}
+
+#timer-svg {
+    transform: rotate(-90deg);
+}
+
+#timer-circle {
+    fill: none;
+    stroke: #ff4444;
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 220; /* périmètre du cercle */
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear;
+}
+
+#timer-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* ===============================
    QUESTIONS
 =============================== */
 .question {
